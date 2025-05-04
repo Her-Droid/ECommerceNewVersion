@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import id.herdroid.ecommerce.data.local.entity.OrderDetailsEntity
 import id.herdroid.ecommerce.data.local.entity.OrderEntity
 import kotlinx.coroutines.flow.Flow
 
@@ -17,5 +18,11 @@ interface OrderDao {
 
     @Query("SELECT * FROM orders WHERE orderId = :orderId LIMIT 1")
     suspend fun getOrderById(orderId: String): OrderEntity?
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertOrderDetails(details: OrderDetailsEntity)
+
+    @Query("SELECT * FROM order_details WHERE orderId = :orderId LIMIT 1")
+    suspend fun getOrderDetailsById(orderId: String): OrderDetailsEntity?
 }
 
