@@ -42,6 +42,7 @@ android {
         viewBinding =  true
 
     }
+    
 }
 
 dependencies {
@@ -78,9 +79,6 @@ dependencies {
     // Hilt
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
-
-    // WorkManager
-    implementation(libs.work.runtime.ktx)
 
     // Paging 3
     implementation(libs.androidx.paging.runtime.ktx)
