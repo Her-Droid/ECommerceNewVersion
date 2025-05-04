@@ -31,6 +31,14 @@ class ProfileBottomSheet : BottomSheetDialogFragment() {
     private var _binding: BottomSheetProfileBinding? = null
     private val binding get() = _binding!!
 
+    private val viewModel: ProfileViewModel by viewModels()
+
+    private val getImage =
+        registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+            uri?.let {
+                viewModel.saveProfileImage(it)
+            }
+        }
 
     override fun onStart() {
         super.onStart()
@@ -52,18 +60,7 @@ class ProfileBottomSheet : BottomSheetDialogFragment() {
         return binding.root
     }
 
-
-    private val getImage =
-        registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
-            uri?.let {
-                viewModel.saveProfileImage(it)
-            }
-        }
-
-
-    private val viewModel: ProfileViewModel by viewModels()
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-
         val bottomSheet = dialog?.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)
         bottomSheet?.let {
             val shapeAppearanceModel = ShapeAppearanceModel.Builder()
@@ -76,19 +73,6 @@ class ProfileBottomSheet : BottomSheetDialogFragment() {
             }
 
             it.background = materialShapeDrawable
-        }
-
-
-        viewModel.profileImage.observe(viewLifecycleOwner) { uri ->
-            Glide.with(this)
-                .load(uri)
-                .apply(
-                    RequestOptions()
-                        .transform(CircleCrop())
-                        .placeholder(R.drawable.ic_profile)
-                        .error(R.drawable.ic_profile)
-                )
-                .into(binding.imgProfile)
         }
 
         viewModel.cartCount.observe(viewLifecycleOwner) {
@@ -114,6 +98,7 @@ class ProfileBottomSheet : BottomSheetDialogFragment() {
         binding.cardCart.setOnClickListener {
             startActivity(Intent(requireContext(), CartActivity::class.java))
         }
+
         binding.cardFavorite.setOnClickListener {
             val navController = requireActivity().findNavController(R.id.nav_host_fragment)
             navController.navigate(R.id.favoriteFragment)
@@ -121,6 +106,19 @@ class ProfileBottomSheet : BottomSheetDialogFragment() {
 
         binding.cardOrders.setOnClickListener {
             startActivity(Intent(requireContext(), ListOrderActivity::class.java))
+        }
+
+
+        viewModel.profileImage.observe(viewLifecycleOwner) { uri ->
+            Glide.with(this)
+                .load(uri)
+                .apply(
+                    RequestOptions()
+                        .transform(CircleCrop())
+                        .placeholder(R.drawable.ic_profile)
+                        .error(R.drawable.ic_profile)
+                )
+                .into(binding.imgProfile)
         }
     }
 
