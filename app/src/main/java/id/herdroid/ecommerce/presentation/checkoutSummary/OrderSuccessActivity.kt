@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import id.herdroid.ecommerce.databinding.ActivitySuccessOrderBinding
+import id.herdroid.ecommerce.presentation.detailOrder.DetailOrderActivity
 import id.herdroid.ecommerce.presentation.main.MainActivity
 
 class OrderSuccessActivity : AppCompatActivity() {
@@ -19,10 +20,13 @@ class OrderSuccessActivity : AppCompatActivity() {
     }
 
     private fun setupListeners() {
-        binding.cvDetailPesanan.setOnClickListener {
-//            val intent = Intent(this, OrderDetailActivity::class.java)
+        val orderId = intent.getStringExtra("order_id")
+
+        binding.btnOrderDetail.setOnClickListener {
+            val intent = Intent(this, DetailOrderActivity::class.java).apply {
+                putExtra("order_id", orderId)
+            }
             startActivity(intent)
-            finish()
         }
 
         binding.cvBackHome.setOnClickListener {

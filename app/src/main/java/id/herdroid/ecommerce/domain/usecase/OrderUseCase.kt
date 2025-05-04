@@ -1,5 +1,6 @@
 package id.herdroid.ecommerce.domain.usecase
 
+import id.herdroid.ecommerce.data.local.entity.OrderDetailsEntity
 import id.herdroid.ecommerce.data.local.entity.OrderEntity
 import id.herdroid.ecommerce.domain.repository.OrderRepository
 import kotlinx.coroutines.flow.Flow
@@ -17,7 +18,13 @@ class OrderUseCase @Inject constructor(
         return repository.getAllOrders()
     }
 
-    suspend fun getOrderDetail(orderId: String): OrderEntity? {
+    suspend fun getOrderDetail(orderId: String): OrderDetailsEntity? {
         return repository.getOrderDetail(orderId)
     }
+
+    suspend fun insertOrderDetails(details: OrderDetailsEntity) {
+        repository.insertOrderDetails(details)
+    }
+
+
 }
