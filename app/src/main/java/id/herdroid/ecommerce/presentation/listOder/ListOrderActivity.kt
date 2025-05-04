@@ -9,8 +9,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import dagger.hilt.android.AndroidEntryPoint
 import id.herdroid.ecommerce.databinding.ActivityListOrderBinding
 import id.herdroid.ecommerce.presentation.detailOrder.DetailOrderActivity
+import id.herdroid.ecommerce.presentation.main.MainActivity
 
-//import id.herdroid.ecommerce.presentation.detailOrder.DetailOrderActivity
 
 @AndroidEntryPoint
 class ListOrderActivity : AppCompatActivity() {
@@ -24,8 +24,14 @@ class ListOrderActivity : AppCompatActivity() {
         binding = ActivityListOrderBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        setSupportActionBar(binding.topAppBar)
+        binding.topAppBar.setNavigationOnClickListener {
+            val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
+        }
+
+
         adapter = ListOrderAdapter(emptyList()) { order ->
-            // Handle item click
             val intent = Intent(this, DetailOrderActivity::class.java).apply {
                 putExtra("order_id", order.orderId)
             }

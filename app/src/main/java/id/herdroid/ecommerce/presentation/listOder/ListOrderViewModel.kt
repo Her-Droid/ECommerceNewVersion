@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import id.herdroid.ecommerce.data.local.entity.OrderDetailsEntity
 import id.herdroid.ecommerce.data.local.entity.OrderEntity
 import id.herdroid.ecommerce.domain.usecase.OrderUseCase
 import kotlinx.coroutines.flow.collectLatest
@@ -18,6 +19,8 @@ class ListOrderViewModel @Inject constructor(
 
     private val _orders = MutableLiveData<List<OrderEntity>>()
     val orders: LiveData<List<OrderEntity>> = _orders
+    private val _selectedOrder = MutableLiveData<OrderDetailsEntity?>()
+    val selectedOrder: LiveData<OrderDetailsEntity?> = _selectedOrder
 
     fun fetchAllOrders() {
         viewModelScope.launch {
@@ -26,6 +29,7 @@ class ListOrderViewModel @Inject constructor(
             }
         }
     }
+
 
 
 }

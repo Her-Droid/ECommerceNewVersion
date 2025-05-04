@@ -5,6 +5,10 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import id.herdroid.ecommerce.data.local.entity.OrderEntity
 import id.herdroid.ecommerce.databinding.ItemOrderBinding
+import id.herdroid.ecommerce.utils.AesEncryptor
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class ListOrderAdapter(
     private var orders: List<OrderEntity>,
@@ -14,15 +18,15 @@ class ListOrderAdapter(
     inner class OrderViewHolder(private val binding: ItemOrderBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(order: OrderEntity) {
-            binding.tvTotalPrice.text = "Total: $${order.totalPrice}"
-            binding.tvOrderDate.text = "Date: ${formatDate(order.orderDate)}"
+            binding.tvTotalPrice.text = "Total: $${String.format("%.2f", order.totalPrice)}"
+            val formatter = SimpleDateFormat("EEEE, d MMM yyyy", Locale.ENGLISH)
+            val dateText = formatter.format(Date(order.orderDate))
+            binding.tvOrderDate.text = dateText
             binding.tvProductCount.text = "Items: ${order.itemCount}"
+            val decryptedId = AesEncryptor.decrypt(order.orderId)
+            binding.tvOrderId.text = "Order ID: #${decryptedId.take(8)}"
             binding.root.setOnClickListener { onClick(order) }
-        }
 
-        private fun formatDate(timestamp: Long): String {
-            val sdf = java.text.SimpleDateFormat("dd MMM yyyy", java.util.Locale.getDefault())
-            return sdf.format(java.util.Date(timestamp))
         }
 
     }
