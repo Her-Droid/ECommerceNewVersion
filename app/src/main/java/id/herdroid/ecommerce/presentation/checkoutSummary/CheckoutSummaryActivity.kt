@@ -15,9 +15,11 @@ import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
 import id.herdroid.ecommerce.R
 import id.herdroid.ecommerce.data.local.entity.CartProductEntity
+import id.herdroid.ecommerce.data.local.entity.OrderDetailsEntity
 import id.herdroid.ecommerce.data.local.entity.OrderEntity
 import id.herdroid.ecommerce.databinding.ActivityCheckoutSummaryBinding
 import id.herdroid.ecommerce.presentation.listOder.ListOrderActivity
+import id.herdroid.ecommerce.utils.AesEncryptor
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -31,6 +33,7 @@ class CheckoutSummaryActivity : AppCompatActivity() {
     private var cartProducts: List<CartProductEntity> = emptyList()
     private var totalPrice: Double = 0.0
     private val viewModel: CheckoutSummaryViewModel by viewModels()
+    private var selectedOrderDateMillis: Long = System.currentTimeMillis()
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -80,10 +83,12 @@ class CheckoutSummaryActivity : AppCompatActivity() {
             datePicker.show(supportFragmentManager, "ORDER_DATE_PICKER")
         }
         datePicker.addOnPositiveButtonClickListener { selection ->
-            val sdf = SimpleDateFormat("dd MMM yyyy", Locale.getDefault())
+            selectedOrderDateMillis = selection
+            val sdf = SimpleDateFormat("EEEE, d MMMM yyyy", Locale.ENGLISH)
             val date = Date(selection)
             binding.etOrderDate.setText(sdf.format(date))
         }
+
 
         binding.orderDateLayout.setEndIconDrawable(R.drawable.ic_calendar)
         binding.orderDateLayout.setEndIconOnClickListener {
@@ -113,38 +118,52 @@ class CheckoutSummaryActivity : AppCompatActivity() {
 
     private fun placeOrder() {
         val address = binding.etShippingAddress.text.toString().trim()
-
+        val productItemsJson = Gson().toJson(cartProducts)
         if (address.isEmpty()) {
             Toast.makeText(this, "Please enter delivery address", Toast.LENGTH_SHORT).show()
             return
         }
 
-        val orderId = UUID.randomUUID().toString()
-        val timestamp = System.currentTimeMillis()
-        val cartJson = Gson().toJson(cartProducts)
+        val productSubtotal = cartProducts.sumOf { it.price * it.quantity }
+        val shippingCost = 5.00
+        val serviceFee = 2.00
+        val total = productSubtotal + shippingCost + serviceFee
+
+        val rawOrderId = AesEncryptor.generateShortOrderId()
+        val encryptedOrderId = AesEncryptor.encrypt(rawOrderId)
 
         val order = OrderEntity(
-            orderId = orderId,
-            orderDate = timestamp,
-            totalPrice = totalPrice,
+            orderId = encryptedOrderId,
+            orderDate = selectedOrderDateMillis,
+            totalPrice = total,
             itemCount = cartProducts.sumOf { it.quantity },
             address = address,
             paymentMethod = "Cash on Delivery (COD)",
-            productItems = cartJson
+            productItems = productItemsJson
         )
 
-        viewModel.saveOrder(order)
-        viewModel.clearCart()
+        val orderDetailsEntity = OrderDetailsEntity(
+            orderId = encryptedOrderId,
+            orderDate = selectedOrderDateMillis,
+            totalPrice = total,
+            productSubtotal = productSubtotal,
+            deliveryFee = shippingCost,
+            serviceFee = serviceFee,
+            address = address,
+            paymentMethod = "Cash on Delivery",
+            deliveryMethod = "Standard Delivery (2-3 days)",
+            productItems = productItemsJson
+        )
+
+        viewModel.insertOrder(order, orderDetailsEntity)
 
         val intent = Intent(this, OrderSuccessActivity::class.java).apply {
-            putParcelableArrayListExtra("cartProducts", ArrayList(cartProducts))
-            putExtra("totalPrice", totalPrice)
-            putExtra("address", address)
-            putExtra("orderDate", binding.etOrderDate.text.toString())
+            putExtra("order_id", encryptedOrderId)
         }
         startActivity(intent)
         finish()
     }
+
 
 
 }
