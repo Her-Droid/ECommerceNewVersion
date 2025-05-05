@@ -13,7 +13,6 @@ import id.herdroid.ecommerce.domain.usecase.OrderUseCase
 import id.herdroid.ecommerce.presentation.checkoutSummary.CheckoutProductAdapter
 import id.herdroid.ecommerce.presentation.listOder.ListOrderActivity
 import id.herdroid.ecommerce.utils.AesEncryptor
-import kotlinx.coroutines.flow.collectLatest
 import java.text.DecimalFormat
 import java.util.Locale
 import javax.inject.Inject
@@ -32,7 +31,9 @@ class DetailOrderActivity : AppCompatActivity() {
         setContentView(binding.root)
         setSupportActionBar(binding.topAppBar)
         binding.topAppBar.setNavigationOnClickListener {
-            onBackPressedDispatcher.onBackPressed()
+            val intent = Intent(this, ListOrderActivity::class.java)
+            startActivity(intent)
+            finish()
         }
         val orderId = intent.getStringExtra("order_id") ?: return
         val decryptedId = AesEncryptor.decrypt(orderId)
