@@ -78,4 +78,11 @@ class ProfileViewModel @Inject constructor(
         }
     }
 
+    fun clearSession() {
+        viewModelScope.launch {
+            preferencesDataStore.clearToken()
+            preferencesDataStore.clearUsername()
+        }
+    }
+
 }

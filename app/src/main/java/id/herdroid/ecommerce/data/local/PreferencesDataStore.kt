@@ -34,6 +34,16 @@ class PreferencesDataStore @Inject constructor(context: Context) {
         _username.value = username
     }
 
+    fun clearToken() {
+        sharedPreferences.edit().remove(TOKEN_KEY).apply()
+        _token.value = null
+    }
+
+    fun clearUsername() {
+        sharedPreferences.edit().remove(USERNAME_KEY).apply()
+        _username.value = null
+    }
+
     fun saveProfileImage(uri: String) {
         sharedPreferences.edit().putString(PROFILE_IMAGE_KEY, uri).apply()
         _profileImage.value = uri

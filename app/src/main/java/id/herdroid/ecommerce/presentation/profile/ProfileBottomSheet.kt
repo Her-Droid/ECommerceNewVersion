@@ -24,6 +24,7 @@ import id.herdroid.ecommerce.R
 import id.herdroid.ecommerce.databinding.BottomSheetProfileBinding
 import id.herdroid.ecommerce.presentation.cart.CartActivity
 import id.herdroid.ecommerce.presentation.listOder.ListOrderActivity
+import id.herdroid.ecommerce.presentation.login.LoginActivity
 
 @AndroidEntryPoint
 class ProfileBottomSheet : BottomSheetDialogFragment() {
@@ -120,6 +121,15 @@ class ProfileBottomSheet : BottomSheetDialogFragment() {
                 )
                 .into(binding.imgProfile)
         }
+
+        binding.logout.setOnClickListener {
+            viewModel.clearSession()
+            val intent = Intent(requireContext(), LoginActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            startActivity(intent)
+            requireActivity().finish()
+        }
+
     }
 
     override fun onDestroyView() {
